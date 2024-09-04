@@ -1,10 +1,8 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React from 'react';
+import React from 'react'
 
 const Persons = ({ persons }) => {
-	console.log('persons in persons.jsx: ', persons);
-
 	return (
 		<>
 			<div>
@@ -15,7 +13,7 @@ const Persons = ({ persons }) => {
 				))}
 			</div>
 		</>
-	);
-};
+	)
+}
 
-export default Persons;
+export default Persons
