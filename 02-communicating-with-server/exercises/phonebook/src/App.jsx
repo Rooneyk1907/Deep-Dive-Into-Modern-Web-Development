@@ -1,23 +1,26 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import personsService from './services/persons'
 const App = () => {
 	const [persons, setPersons] = useState([])
 	const [filter, setFilter] = useState('')
 
 	useEffect(() => {
-		console.log('effect')
-		axios.get('http://localhost:3001/persons').then((response) => {
-			console.log('promise fulfilled')
-			setPersons(response.data)
-		})
+		personsService.getAll().then((initialPersons) => setPersons(initialPersons))
 	}, [])
-	console.log('render', persons.length, 'persons')
+
+	// console.log('render', persons.length, 'persons')
 
 	const filterHandler = (e) => {
 		setFilter(e.target.value.toLowerCase())
+	}
+
+	const deleteHandler = (name, id) => {
+		personsService.remove(name, id).then(() => {
+			setPersons(persons.filter((person) => person.id !== id))
+		})
 	}
 
 	const filteredPersons = persons.map(
@@ -32,7 +35,7 @@ const App = () => {
 				<h2>add a new</h2>
 				<PersonForm persons={persons} setPersons={setPersons} />
 				<h2>Numbers</h2>
-				<Persons persons={filteredPersons} />
+				<Persons persons={filteredPersons} deleteHandler={deleteHandler} />
 			</div>
 		</>
 	)
