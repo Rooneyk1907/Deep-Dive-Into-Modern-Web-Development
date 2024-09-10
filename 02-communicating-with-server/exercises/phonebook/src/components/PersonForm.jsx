@@ -1,8 +1,14 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useState } from 'react'
 import personsService from '../services/persons'
 
-const PersonForm = ({ persons, setPersons }) => {
+const PersonForm = ({
+	persons,
+	setPersons,
+	setNotificationMessage,
+	setNotificationType,
+}) => {
 	const [newName, setNewName] = useState('')
 	const [newNumber, setNewNumber] = useState('')
 
@@ -33,14 +39,35 @@ const PersonForm = ({ persons, setPersons }) => {
 									person.name !== returnedPerson.name ? person : returnedPerson
 								)
 							)
-							// console.log('post-map: ', persons)
+							setNotificationMessage(
+								`Updated ${returnedPerson.name} with new number: ${returnedPerson.number}`
+							)
+							setTimeout(() => {
+								setNotificationMessage(null)
+							}, 5000)
+						})
+						.catch((error) => {
+							setNotificationType('error')
+							setNotificationMessage(
+								`Information of ${name} has already been removed from server`
+							)
+							setTimeout(() => {
+								setNotificationMessage(null)
+								setNotificationType('success')
+							}, 5000)
 						})
 			  })()
-			: personsService.create(personObject).then((returnedPersons) => {
-					setPersons(persons.concat(returnedPersons))
-					setNewName('')
-					setNewNumber('')
-			  })
+			: personsService
+					.create(personObject)
+					.then((returnedPersons) => {
+						setNotificationMessage(`Added ${returnedPersons.name}`)
+						setTimeout(() => {
+							setNotificationMessage(null)
+						}, 5000)
+						setPersons(persons.concat(returnedPersons))
+						setNewName('')
+						setNewNumber('')
+					})
 	}
 
 	return (
