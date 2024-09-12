@@ -1,20 +1,25 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React from 'react'
+import DeleteButton from './DeleteButton'
 
 const Persons = ({ persons, deleteHandler }) => {
+	const personArray = persons
+
 	return (
 		<>
-			<div>
-				{persons.map((person) => (
+			{personArray.map((person) => (
+				<div key={person.id}>
 					<div key={person.id}>
 						{person.name} {person.number}
-						<button onClick={() => deleteHandler(person.name, person.id)}>
-							Delete
-						</button>
+						<DeleteButton
+							key={person.id}
+							person={person}
+							deleteHandler={deleteHandler}
+						/>
 					</div>
-				))}
-			</div>
+				</div>
+			))}
 		</>
 	)
 }

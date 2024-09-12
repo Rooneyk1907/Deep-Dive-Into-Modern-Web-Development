@@ -13,6 +13,7 @@
 	"author": "Kevin Rooney",
 	"license": "MIT",
 	"dependencies": {
+		"cors": "^2.8.5",
 		"express": "^4.20.0",
 		"morgan": "^1.10.0"
 	},

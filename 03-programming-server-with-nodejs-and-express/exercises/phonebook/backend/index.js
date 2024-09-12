@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 var morgan = require('morgan')
+const cors = require('cors')
+const PORT = process.env.PORT || 3001
 
 const requestLogger = (request, response, next) => {
 	console.log('Method:', request.method)
@@ -10,6 +12,7 @@ const requestLogger = (request, response, next) => {
 	next()
 }
 
+app.use(cors())
 app.use(express.json())
 app.use(requestLogger)
 morgan.token('body', (req, res) => JSON.stringify(req.body))
@@ -51,7 +54,6 @@ let persons = [
 	},
 ]
 
-const PORT = 3001
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })
@@ -62,7 +64,7 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/info', (request, response) => {
 	response.send(
-		`<p>Phonebook has ino for ${
+		`<p>Phonebook has info for ${
 			persons.length
 		} people</p><br /><p>${Date()}</p>`
 	)
@@ -81,12 +83,9 @@ app.get('/api/persons/:id', (request, response) => {
 app.delete('/api/persons/:id', (request, response) => {
 	const id = request.params.id
 
-	if (persons.id) {
-		persons = persons.filter((person) => person.id !== id)
-		response.status(204).end()
-	} else {
-		response.status(404).end()
-	}
+	persons = persons.filter((person) => person.id !== id)
+
+	response.status(204).end()
 })
 
 const generateId = () => {
@@ -103,30 +102,32 @@ app.post('/api/persons', (request, response) => {
 		name: body.name,
 		number: body.number,
 	}
-	const nameExists = persons
-		.map((person) => person.name.toLowerCase())
-		.includes(newPerson.name.toLowerCase())
 
-	if (!body) {
+	// const nameExists = persons
+	// 	.map((person) => person.name.toLowerCase())
+	// 	.includes(body.name.toLowerCase())
+	console.log(body)
+	console.log(newPerson)
+
+	if (!body || !body.name || !body.number) {
 		return response.status(400).json({
 			error: 'please fill out all fields',
 		})
 	}
-	if (nameExists) {
-		return response.status(400).json({
-			error: 'name must be unique',
+	// if (nameExists) {
+	// 	return response.status(400).json({
+	// 		error: 'name must be unique',
+	// 	})
+	{
+		persons = persons.concat(newPerson)
+		return response.status(202).json({
+			content: 'new entry created',
 		})
 	}
-
-	response.status(202).json({
-		content: 'new entry created',
-	})
-	persons = persons.concat(newPerson)
-	response.json(newPerson)
 })
 
 const unknownEndpoint = (request, response) => {
-	response.status(404).sen({ error: 'unknown endpoint' })
+	response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)

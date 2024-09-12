@@ -19,7 +19,7 @@ const Notification = ({ message, notificationType }) => {
 		marginBottom: 10,
 	}
 
-	console.log(notificationType, notificationSuccess, notificationError)
+	// console.log(notificationType, notificationSuccess, notificationError)
 
 	if (message === null) {
 		return null
