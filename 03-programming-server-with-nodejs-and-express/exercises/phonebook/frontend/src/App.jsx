@@ -121,7 +121,7 @@ const App = () => {
 	const filteredPersons = persons.map((person) => {
 		if (person.name) {
 			const name = person.name
-			return name.toLowerCase().includes(filter) && person
+			return name.toLowerCase().includes(filter.toLowerCase()) && person
 		}
 	})
 
