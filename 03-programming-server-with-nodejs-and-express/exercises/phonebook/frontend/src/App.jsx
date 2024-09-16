@@ -10,7 +10,7 @@ const App = () => {
 	const [persons, setPersons] = useState([])
 	const [filter, setFilter] = useState('')
 	const [notificationMessage, setNotificationMessage] = useState(null)
-	const [notificationType, setNotificationType] = useState('success')
+	const [notificationType, setNotificationType] = useState(null)
 	const [newName, setNewName] = useState('')
 	const [newNumber, setNewNumber] = useState('')
 
@@ -78,10 +78,12 @@ const App = () => {
 							person.name !== returnedPerson.name ? person : returnedPerson
 						)
 					)
+					setNotificationType('success')
 					setNotificationMessage(
 						`Updated ${returnedPerson.name} with new number: ${returnedPerson.number}`
 					)
 					setTimeout(() => {
+						setNotificationType(null)
 						setNotificationMessage(null)
 					}, 5000)
 				})
@@ -92,23 +94,25 @@ const App = () => {
 					)
 					setTimeout(() => {
 						setNotificationMessage(null)
-						setNotificationType('success')
+						setNotificationType(null)
 					}, 5000)
 				})
 		} else {
 			personsService
 				.create(personObject)
 				.then((returnedPersons) => {
-					setPersons((persons) => persons.concat(personObject))
+					setPersons((persons) => persons.concat(returnedPersons))
+					setNotificationType('success')
 					setNotificationMessage(`Added ${personObject.name}`)
 					setTimeout(() => {
 						setNotificationMessage(null)
 					}, 5000)
 				})
-				.catch((err) => {
+				.catch((error) => {
 					setNotificationType('error')
-					setNotificationMessage(`Failed to add ${personObject.name}`)
+					setNotificationMessage(error.response.data.error)
 					setTimeout(() => {
+						setNotificationType(null)
 						setNotificationMessage(null)
 					}, 5000)
 				})

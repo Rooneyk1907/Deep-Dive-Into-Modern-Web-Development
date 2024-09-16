@@ -10,35 +10,30 @@ mongoose.set('strictQuery', false)
 mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
-	name: String,
-	number: String,
+  name: String,
+  number: String,
 })
 
 const Person = mongoose.model('Person', personSchema)
 const person = new Person({
-	name: newName,
-	number: newNumber,
+  name: newName,
+  number: newNumber,
 })
 
 if (process.argv.length < 3) {
-	console.log('give password as argument')
-	process.exit(1)
+  console.log('give password as argument')
+  process.exit(1)
 } else if (process.argv.length === 3) {
-	Person.find({}).then((result) => {
-		console.log('phonebook:')
-		result.forEach((person) => {
-			console.log(person.name, person.number)
-		})
-		mongoose.connection.close()
-	})
+  Person.find({}).then((result) => {
+    console.log('phonebook:')
+    result.forEach((person) => {
+      console.log(person.name, person.number)
+    })
+    mongoose.connection.close()
+  })
 } else {
-	// else {
-	// 	console.log('please provide a name and number to add to the phonebook')
-	// 	process.exit(1)
-	// }
-
-	person.save().then((result) => {
-		console.log(`added ${newName} number ${newNumber} to phonebook`)
-		mongoose.connection.close()
-	})
+  person.save().then(() => {
+    console.log(`added ${newName} number ${newNumber} to phonebook`)
+    mongoose.connection.close()
+  })
 }
