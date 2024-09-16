@@ -1,38 +1,35 @@
-/* eslint-disable no-unused-vars */
-
 import { useState, useEffect } from 'react'
 import Note from './components/Note'
-import noteService from './services/notes'
 import Notification from './components/Notification'
-
-const Footer = () => {
-	const footerStyle = {
-		color: 'green',
-		fontStyle: 'italic',
-		fontSize: 16,
-	}
-	return (
-		<div style={footerStyle}>
-			<br />
-			<em>
-				Note app, Department of Computer Science, University of Helsinki 2024
-			</em>
-		</div>
-	)
-}
+import Footer from './components/Footer'
+import noteService from './services/notes'
 
 const App = () => {
-	const [notes, setNotes] = useState(null)
+	const [notes, setNotes] = useState([])
 	const [newNote, setNewNote] = useState('')
 	const [showAll, setShowAll] = useState(true)
-	const [errorMessage, setErrorMessage] = useState('some error happened...')
+	const [errorMessage, setErrorMessage] = useState(null)
 
 	useEffect(() => {
-		noteService.getAll().then((initialNotes) => setNotes(initialNotes))
+		noteService
+			.getAll()
+			.then((initialNotes) => {
+				setNotes(initialNotes)
+			})
+			.catch((error) => console.log(error))
 	}, [])
 
-	if (!notes) {
-		return null
+	const addNote = (event) => {
+		event.preventDefault()
+		const noteObject = {
+			content: newNote,
+			important: Math.random() > 0.5,
+		}
+
+		noteService.create(noteObject).then((returnedNote) => {
+			setNotes(notes.concat(returnedNote))
+			setNewNote('')
+		})
 	}
 
 	const toggleImportanceOf = (id) => {
@@ -46,31 +43,15 @@ const App = () => {
 			})
 			.catch((error) => {
 				setErrorMessage(
-					`Note '${note.content}' was already removed from the server`
+					`Note '${note.content}' was already removed from server`
 				)
 				setTimeout(() => {
 					setErrorMessage(null)
 				}, 5000)
-				setNotes(notes.filter((n) => n.id !== id))
 			})
 	}
 
-	const addNote = (event) => {
-		event.preventDefault()
-		const noteObject = {
-			content: newNote,
-			important: Math.random() < 0.5,
-			id: String(notes.length + 1),
-		}
-
-		noteService.create(noteObject).then((returnedNote) => {
-			setNotes(notes.concat(returnedNote))
-			setNewNote('')
-		})
-	}
-
 	const handleNoteChange = (event) => {
-		console.log(event.target.value)
 		setNewNote(event.target.value)
 	}
 
@@ -96,7 +77,7 @@ const App = () => {
 			</ul>
 			<form onSubmit={addNote}>
 				<input value={newNote} onChange={handleNoteChange} />
-				<button type='submit'>Save</button>
+				<button type='submit'>save</button>
 			</form>
 			<Footer />
 		</div>
