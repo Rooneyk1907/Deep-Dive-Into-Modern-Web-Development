@@ -21,6 +21,8 @@ const App = () => {
 			.catch((err) => console.log('error', err))
 	}, [])
 
+	// console.log('persons after useEffect: ', persons)
+
 	const filterHandler = (e) => {
 		setFilter(e.target.value)
 	}
@@ -56,19 +58,17 @@ const App = () => {
 			number: newNumber,
 		}
 
-		console.log('add Person: ', personObject)
+		// console.log('personObject: ', personObject)
 
-		const nameExists = persons.find((person) => person.name === newName)
+		const existingName = persons.find((person) => person.name === newName)
+		// console.log('existingName: ', existingName)
 
-		console.log('persons: ', persons)
+		// console.log('persons: ', persons)
+		if (existingName) {
+			const updatedEntry = { ...existingName, number: newNumber }
 
-		if (nameExists) {
-			const personToUpdate = { ...nameExists }
-
-			console.log('person to update: ', personToUpdate)
-			console.log('New Number: ', newNumber)
 			personsService
-				.update(personToUpdate, newNumber)
+				.update(updatedEntry, newNumber)
 				.then((returnedPerson) => {
 					// console.log(returnedPerson)
 					// setPersons(persons)
@@ -78,7 +78,6 @@ const App = () => {
 							person.name !== returnedPerson.name ? person : returnedPerson
 						)
 					)
-					console.log(persons)
 					setNotificationMessage(
 						`Updated ${returnedPerson.name} with new number: ${returnedPerson.number}`
 					)
@@ -89,7 +88,7 @@ const App = () => {
 				.catch((error) => {
 					setNotificationType('error')
 					setNotificationMessage(
-						`Information of ${personToUpdate.name} has already been removed from server`
+						`Information of ${personObject.name} has already been removed from server`
 					)
 					setTimeout(() => {
 						setNotificationMessage(null)
@@ -119,11 +118,13 @@ const App = () => {
 	}
 
 	const filteredPersons = persons.map((person) => {
-		if (person.name) {
+		if (person.name !== undefined || null) {
 			const name = person.name
 			return name.toLowerCase().includes(filter.toLowerCase()) && person
 		}
 	})
+
+	// console.log('filtered persons: ', filteredPersons)
 
 	return (
 		<>

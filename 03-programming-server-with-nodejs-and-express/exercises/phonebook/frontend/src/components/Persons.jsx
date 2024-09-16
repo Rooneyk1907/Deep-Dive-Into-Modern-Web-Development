@@ -4,24 +4,11 @@ import React from 'react'
 import DeleteButton from './DeleteButton'
 
 const Persons = ({ persons, deleteHandler }) => {
-	const personArray = persons
-
-	return (
-		<>
-			{personArray.map((person) => (
-				<div key={person.id}>
-					<div key={person.id}>
-						{person.name} {person.number}
-						<DeleteButton
-							key={person.id}
-							person={person}
-							deleteHandler={deleteHandler}
-						/>
-					</div>
-				</div>
-			))}
-		</>
-	)
+	return persons.map((person) => (
+		<div key={person.id}>
+			{person.name} {person.number}
+			<DeleteButton person={person} deleteHandler={deleteHandler} />
+		</div>
+	))
 }
-
 export default Persons

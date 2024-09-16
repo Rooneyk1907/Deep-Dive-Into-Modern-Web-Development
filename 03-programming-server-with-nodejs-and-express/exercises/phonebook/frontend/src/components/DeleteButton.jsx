@@ -2,11 +2,9 @@
 
 const DeleteButton = ({ person, deleteHandler }) => {
 	return person ? (
-		<>
-			<button onClick={() => deleteHandler(person.name, person.id)}>
-				Delete
-			</button>
-		</>
+		<button onClick={() => deleteHandler(person.name, person.id)}>
+			Delete
+		</button>
 	) : null
 }
 

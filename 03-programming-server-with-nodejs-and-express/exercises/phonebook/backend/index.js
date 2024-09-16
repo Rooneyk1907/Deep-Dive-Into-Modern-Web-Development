@@ -1,8 +1,17 @@
 const express = require('express')
+const mongoose = require('mongoose')
+require('dotenv').config()
+
 const app = express()
 var morgan = require('morgan')
 const cors = require('cors')
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
+
+const Person = require('./models/person')
+
+app.listen(PORT, () => {
+	console.log(`Server running on port ${PORT}`)
+})
 
 const requestLogger = (request, response, next) => {
 	console.log('Method:', request.method)
@@ -12,10 +21,12 @@ const requestLogger = (request, response, next) => {
 	next()
 }
 
+//* MIDDLEWARE *//
 app.use(cors())
-app.use(express.static('dist'))
-app.use(express.json());
+app.use(express.json())
 app.use(requestLogger)
+// .use(express.static('dist'))
+
 morgan.token('body', (req, res) => JSON.stringify(req.body))
 app.use(
 	morgan((tokens, req, res) => {
@@ -32,99 +43,100 @@ app.use(
 	})
 )
 
-let persons = [
-	{
-		id: '1',
-		name: 'Arto Hellas',
-		number: '040-123456',
-	},
-	{
-		id: '2',
-		name: 'Ada Lovelace',
-		number: '39-44-5323523',
-	},
-	{
-		id: '3',
-		name: 'Dan Abramov',
-		number: '12-43-234345',
-	},
-	{
-		id: '4',
-		name: 'Mary Poppendieck',
-		number: '39-23-6423122',
-	},
-]
+// let persons = [
+// 	{
+// 		id: '1',
+// 		name: 'Arto Hellas',
+// 		number: '040-123456',
+// 	},
+// 	{
+// 		id: '2',
+// 		name: 'Ada Lovelace',
+// 		number: '39-44-5323523',
+// 	},
+// 	{
+// 		id: '3',
+// 		name: 'Dan Abramov',
+// 		number: '12-43-234345',
+// 	},
+// 	{
+// 		id: '4',
+// 		name: 'Mary Poppendieck',
+// 		number: '39-23-6423122',
+// 	},
+// ]
 
-app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`)
+app.get('/api/persons', (request, response, next) => {
+	Person.find({})
+		.then((people) => {
+			response.json(people)
+		})
+		.catch((error) => next(error))
 })
 
-app.get('/api/persons', (request, response) => {
-	response.json(persons)
-})
-
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
 	response.send(
 		`<p>Phonebook has info for ${
-			persons.length
+			Person.length
 		} people</p><br /><p>${Date()}</p>`
 	)
 })
 
-app.get('/api/persons/:id', (request, response) => {
-	const id = request.params.id
-	const person = persons.find((person) => person.id === id)
-	if (person) {
-		response.json(person)
-	} else {
-		response.status(404).end()
-	}
+app.get('/api/persons/:id', (request, response, next) => {
+	Person.findById(request.params.id)
+		.then((result) => response.json(result).end())
+		.catch((error) => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-	const id = request.params.id
-
-	persons = persons.filter((person) => person.id !== id)
-
-	response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+	Person.findByIdAndDelete(request.params.id)
+		.then((result) => {
+			response.status(204).end()
+		})
+		.catch((error) => next(error))
 })
 
-const generateId = () => {
-	const maxId =
-		persons.length > 0 ? Math.max(...persons.map((n) => Number(n.id))) : 0
-
-	return String(maxId + 1)
-}
-
-app.post('/api/persons', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
 	const body = request.body
-	const newPerson = {
-		id: generateId(),
+
+	const person = {
 		name: body.name,
 		number: body.number,
 	}
 
-	// const nameExists = persons
-	// 	.map((person) => person.name.toLowerCase())
-	// 	.includes(body.name.toLowerCase())
-	console.log(body)
-	console.log(newPerson)
+	Person.findByIdAndUpdate(request.params.id, person, { new: true })
+		.then((updatedPerson) => {
+			response.json(updatedPerson)
+		})
+		.catch((error) => next(error))
+})
 
-	if (!body || !body.name || !body.number) {
+// const generateId = () => {
+// 	const maxId =
+// 		persons.length > 0 ? Math.max(...persons.map((n) => Number(n.id))) : 0
+
+// 	return String(maxId + 1)
+// }
+
+app.post('/api/persons', (request, response, next) => {
+	const body = request.body
+
+	if (!body.name || !body.number) {
 		return response.status(400).json({
 			error: 'please fill out all fields',
 		})
 	}
-	// if (nameExists) {
-	// 	return response.status(400).json({
-	// 		error: 'name must be unique',
-	// 	})
-	{
-		persons = persons.concat(newPerson)
-		return response.status(202).json({
-			content: 'new entry created',
+	const person = new Person({
+		name: body.name,
+		number: body.number,
+	})
+
+	person
+		.save()
+		.then((newEntry) => {
+			response.json(newEntry)
 		})
-	}
+		.catch((error) => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
@@ -132,3 +144,14 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+	console.error(error.message)
+
+	if (error.name === 'CastError') {
+		return response.status(400).send({ error: 'malformatted id' })
+	}
+	next(error)
+}
+
+app.use(errorHandler)
