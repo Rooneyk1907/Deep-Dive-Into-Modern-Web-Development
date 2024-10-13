@@ -67,5 +67,5 @@ describe('favorite blog', () => {
     assert.deepStrictEqual(listHelper.favoriteBlog(blogs), popularBLog)
   })
 
-  return console.log(listHelper.favoriteBlog(blogs))
+
 })
