@@ -10,7 +10,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationType, setNotificationType] = useState('success')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -39,13 +40,28 @@ const App = () => {
       url,
     }
     // TODO: Set notification for successful and failed blog entries (check what notifcation package was used in earlier parts)
-    blogService.create(blogPost).then((returnedBlog) => {
-      setBlogs(blogs.concat(returnedBlog))
-      setNewBlog('')
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-    })
+    try {
+      blogService.create(blogPost).then((returnedBlog) => {
+        setBlogs(blogs.concat(returnedBlog))
+        setNotificationMessage(
+          `a new blog ${returnedBlog.title} by ${returnedBlog.author} added`
+        )
+        setNewBlog('')
+        setTitle('')
+        setAuthor('')
+        setUrl('')
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
+      })
+    } catch (error) {
+      setNotificationType('error')
+      setNotificationMessage(error.message)
+      setTimeout(() => {
+        setNotificationMessage(null)
+        setNotificationType('success')
+      })
+    }
   }
 
   const handleLogin = async (event) => {
@@ -61,9 +77,11 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('Wrong Credentials')
+      setNotificationMessage('Wrong Credentials')
+      setNotificationType('error')
       setTimeout(() => {
-        setErrorMessage(null)
+        setNotificationMessage(null)
+        setNotificationType('success')
       }, 5000)
     }
   }
@@ -130,11 +148,17 @@ const App = () => {
       {user === null ? (
         <>
           <h2>log in to application</h2>
+          <Notification
+            message={notificationMessage}
+            notificationType={notificationType}
+          />
+
           {loginForm()}
         </>
       ) : (
         <div>
           <h2>blogs</h2>
+          <Notification message={notificationMessage} />
           <p>{user.name} logged in</p>
           <div>
             {blogs.map((blog) => (
@@ -145,8 +169,6 @@ const App = () => {
           <div>{blogForm()}</div>
         </div>
       )}
-
-      <Notification message={errorMessage} />
     </div>
   )
 }
