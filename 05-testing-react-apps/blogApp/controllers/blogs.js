@@ -53,10 +53,12 @@ blogsRouter.get('/:id', async (request, response) => {
 blogsRouter.put('/:id', authMiddleware, async (request, response) => {
   const body = request.body
 
-  const updatedBlog = { ...body }
+  const blog = {
+    ...body,
+  }
 
-  await Blog.findByIdAndUpdate(request.params.id, updatedBlog, { new: true })
-  response.json(updatedBlog)
+  await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+  response.json(blog)
 })
 
 module.exports = blogsRouter

@@ -36,23 +36,31 @@ const errorHandler = (error, request, response, next) => {
   } else if (error.name === 'TokenExpiredError') {
     return response.status(401).json({ error: 'token expired' })
   }
-
   next(error)
+
 }
 const authMiddleware = async (request, response, next) => {
-  const authorization = await request.headers.authorization
-  if (authorization && authorization.includes('Bearer ')) {
-    const token = authorization.replace('Bearer ', '')
-    request.token = token
-  } else {
-    return response.status(401).json({ error: 'no token' })
+  try {
+
+    const authorization = await request.headers.authorization
+    if (authorization && authorization.includes('Bearer ')) {
+      const token = authorization.replace('Bearer ', '')
+      request.token = token
+    } else {
+      return response.status(401).json({ error: 'no token' })
+    }
+
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    const user = await User.findById(decodedToken.id)
+    request.user = user
+
+    next()
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return response.status(401).json({ error: 'token expired'})
+    }
+    next(error)
   }
-
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  const user = await User.findById(decodedToken.id)
-  request.user = user
-
-  next()
 }
 
 module.exports = {
