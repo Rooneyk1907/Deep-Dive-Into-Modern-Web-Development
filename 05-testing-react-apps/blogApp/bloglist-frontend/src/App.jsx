@@ -6,6 +6,7 @@ import loginService from './services/login'
 
 import NewBlog from './components/NewBlog'
 import Togglable from './components/Togglable'
+import LoginForm from './components/LoginForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -77,15 +78,20 @@ const App = () => {
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
-    setNotificationMessage('Session Expired. Please log in again')
-    setNotificationType('error')
+    try {
+      window.localStorage.removeItem('loggedBlogappUser')
+      setUser(null)
+    } catch (error) {
+      if (error.message === 'token expired') {
+        setNotificationMessage('Session Expired. Please log in again')
+        setNotificationType('error')
 
-    setTimeout(() => {
-      setNotificationMessage(null)
-      setNotificationType('success')
-    }, 5000)
+        setTimeout(() => {
+          setNotificationMessage(null)
+          setNotificationType('success')
+        }, 5000)
+      }
+    }
   }
 
   const handleLike = async (blog) => {
@@ -111,30 +117,6 @@ const App = () => {
     console.log(`blog ${title} deleted`)
     setBlogs(blogs.map((blog) => blog.id !== id && blog))
   }
-
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
-          type='text'
-          value={username}
-          name='Username'
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-        <input
-          type='text'
-          value={password}
-          name='Password'
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type='submit'>login</button>
-    </form>
-  )
 
   const sortedBlogs = [...blogs].sort(
     (blogOne, blogTwo) => blogTwo.likes - blogOne.likes
@@ -163,7 +145,15 @@ const App = () => {
             message={notificationMessage}
           />
 
-          {loginForm()}
+          <LoginForm
+            handleLogin={handleLogin}
+            setUsername={setUsername}
+            setPassword={setPassword}
+            // handleUsernameChange={handleUsernameChange}
+            // handlePasswordChange={handlePasswordChange}
+            username={username}
+            password={password}
+          />
         </>
       ) : (
         <div>
@@ -174,8 +164,13 @@ const App = () => {
           />
           <p>{user.name} logged in</p>
 
+          <div>
+            <button onClick={handleLogout}>logout</button>
+          </div>
+
           {blogForm()}
 
+          <Togglable>buttonLabel unohtui...</Togglable>
           <div>
             {sortedBlogs.map(
               (blog) =>

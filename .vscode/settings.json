@@ -1,12 +1,13 @@
 {
-    "files.eol": "\n",
-    "files.trimFinalNewlines": true,
-    "prettier.semi": false,
-    "prettier.experimentalTernaries": true,
-    "vs-code-prettier-eslint.prettierLast": true,
-    "prettier.jsxSingleQuote": true,
-    "prettier.proseWrap": "always",
-    "prettier.singleQuote": true,
-    "prettier.vueIndentScriptAndStyle": true,
-    "files.insertFinalNewline": true
+  "files.eol": "\n",
+  "files.trimFinalNewlines": true,
+  "prettier.semi": false,
+  "prettier.experimentalTernaries": true,
+  "vs-code-prettier-eslint.prettierLast": true,
+  "prettier.jsxSingleQuote": true,
+  "prettier.proseWrap": "always",
+  "prettier.singleQuote": true,
+  "prettier.vueIndentScriptAndStyle": true,
+  "files.insertFinalNewline": true,
+  "cSpell.words": ["Togglable"]
 }

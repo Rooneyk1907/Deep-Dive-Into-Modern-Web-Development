@@ -1,15 +1,11 @@
 import { useState } from 'react'
-// import jwt from 'jsonwebtoken'
+import PropTypes from 'prop-types'
 
-const Blog = ({ blog, handleLike, handleDelete, blogUserId, user }) => {
+const Blog = ({ blog, handleLike, handleDelete, user }) => {
   const [detailVisibility, setDetailVisibility] = useState(false)
 
   const hideWhenVisible = { display: detailVisibility ? 'none' : '' }
   const showWhenVisible = { display: detailVisibility ? '' : 'none' }
-
-  const toggleVisibility = () => {
-    setDetailVisibility(!visible)
-  }
 
   const blogStyle = {
     paddingTop: 10,
@@ -32,7 +28,6 @@ const Blog = ({ blog, handleLike, handleDelete, blogUserId, user }) => {
           </span>
         </div>
         <div>{author}</div>
-
 
         {blog.user.id === user.id ? (
           <div>
@@ -61,6 +56,13 @@ const Blog = ({ blog, handleLike, handleDelete, blogUserId, user }) => {
       </div>
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  handleLike: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 }
 
 export default Blog

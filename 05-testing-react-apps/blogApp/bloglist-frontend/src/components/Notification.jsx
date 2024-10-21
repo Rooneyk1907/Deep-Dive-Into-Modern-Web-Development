@@ -1,4 +1,5 @@
-/* eslint-disable react/prop-types */
+import PropTypes from 'prop-types'
+
 const Notification = ({ message, notificationType }) => {
   const notificationSuccess = {
     color: 'green',
@@ -33,6 +34,11 @@ const Notification = ({ message, notificationType }) => {
       </div>
     )
   }
+}
+
+Notification.propTypes = {
+  message: PropTypes.string.isRequired,
+  notificationType: PropTypes.string.isRequired,
 }
 
 export default Notification
