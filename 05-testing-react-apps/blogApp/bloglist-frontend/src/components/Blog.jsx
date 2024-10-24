@@ -19,18 +19,17 @@ const Blog = ({ blog, handleLike, handleDelete, user }) => {
     const { title, url, id, author, likes } = blog
 
     return (
-      <div style={showWhenVisible}>
-        <div>{url}</div>
+      <div style={showWhenVisible} className='togglableContent'>
+        <div>{blog.url}</div>
         <div>
-          Likes {likes}
+          Likes {blog.likes}
           <span>
             <button onClick={() => handleLike(blog)}>Like</button>
           </span>
         </div>
-        <div>{author}</div>
 
         {blog.user.id === user.id ? (
-          <div>
+          <div id='delete-button'>
             <button onClick={() => handleDelete(blog)}>Delete</button>
           </div>
         ) : null}
@@ -41,7 +40,12 @@ const Blog = ({ blog, handleLike, handleDelete, user }) => {
   return (
     <div style={blogStyle}>
       <div>
-        {blog.title} <span style={hideWhenVisible}>{blog.author}</span>
+        <div>{blog.title} </div>
+
+        {blogDetails()}
+
+        <div>{blog.author}</div>
+
         <span style={hideWhenVisible}>
           <button onClick={() => setDetailVisibility(true)}>
             Show Details
@@ -52,7 +56,6 @@ const Blog = ({ blog, handleLike, handleDelete, user }) => {
             Hide Details
           </button>
         </span>
-        {blogDetails()}
       </div>
     </div>
   )

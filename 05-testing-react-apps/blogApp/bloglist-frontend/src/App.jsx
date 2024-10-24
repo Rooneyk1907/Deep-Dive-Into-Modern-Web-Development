@@ -113,7 +113,7 @@ const App = () => {
   const handleDelete = async (blog) => {
     const { title, author, id } = blog
     window.confirm(`Delete blog ${title} by ${author}?`)
-    const blogToDelete = await blogService.deleteBlog(id)
+    await blogService.deleteBlog(id)
     console.log(`blog ${title} deleted`)
     setBlogs(blogs.map((blog) => blog.id !== id && blog))
   }
@@ -121,15 +121,13 @@ const App = () => {
   const sortedBlogs = [...blogs].sort(
     (blogOne, blogTwo) => blogTwo.likes - blogOne.likes
   )
-  // console.log('unsorted blogs', blogs)
-  // console.log('sorted blogs', sortedBlogs)
 
   const blogFormRef = useRef()
   const blogForm = () => {
     return (
       <div>
         <Togglable buttonLabel='new blog' ref={blogFormRef}>
-          <NewBlog createBlog={addBlog} />
+          <NewBlog add={addBlog} />
         </Togglable>
       </div>
     )
