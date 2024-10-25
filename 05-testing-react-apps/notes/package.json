@@ -7,6 +7,7 @@
     "start": "cross-env NODE_ENV=production node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "test": "cross-env NODE_ENV=test node --test",
+    "start:test": "cross-env NODE_ENV=test nodemon index.js",
     "lint": "eslint ."
   },
   "author": "",
@@ -23,9 +24,11 @@
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.0",
+    "@playwright/test": "^1.48.1",
     "@stylistic/eslint-plugin-js": "^1.6.1",
     "@testing-library/jest-dom": "^6.6.2",
     "@testing-library/react": "^16.0.1",
+    "@types/node": "^22.7.9",
     "eslint": "^8.56.0",
     "jsdom": "^25.0.1",
     "nodemon": "^3.0.3",

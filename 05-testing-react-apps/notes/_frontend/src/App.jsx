@@ -28,10 +28,10 @@ const App = () => {
   }, [])
 
   const addNote = (noteObject) => {
-    noteFormRef.current.toggleVisibility()
+    // noteFormRef.current.toggleVisibility()
     noteService.create(noteObject).then((returnedNote) => {
       setNotes(notes.concat(returnedNote))
-      setNewNote('')
+      // setNewNote('')
     })
   }
 
@@ -103,10 +103,7 @@ const App = () => {
     return (
       <div>
         <div style={hideWhenVisible}>
-          <button onClick={() => setLoginVisible(true)}>log in</button>
-        </div>
-        <div style={showWhenVisible}>
-          <Togglable buttonLabel='login'>
+          <Togglable buttonLabel='log in'>
             <LoginForm
               username={username}
               password={password}
