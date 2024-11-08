@@ -1,10 +1,12 @@
 const { test, describe, expect, beforeEach } = require('@playwright/test')
+const { loginWith, createNote } = require('./helper')
 
-//TODO: HELPER FUNCTIONS FOR TEST
+//TODO: NOTE IMPORTANCE CHANGE REVISITED
 
 describe('Note app', () => {
   beforeEach(async ({ page, request }) => {
-    await request.post('http://localhost:3001/api/testing/reset')
+    await page.goto('/')
+    await request.post('/api/testing/reset')
     await request.post('http://localhost:3001/api/users', {
       data: {
         name: 'John Test',
@@ -12,8 +14,6 @@ describe('Note app', () => {
         password: '1234',
       },
     })
-
-    await page.goto('http://localhost:5173')
   })
   test('front page can be opened', async ({ page }) => {
     const locator = await page.getByText('Notes')
@@ -26,22 +26,13 @@ describe('Note app', () => {
     ).toBeVisible()
   })
 
-  test('login form can be opened', async ({ page }) => {
-    await page.getByRole('button', { name: 'log in' }).click()
-
-    await page.getByTestId('username').fill('johnt')
-    await page.getByTestId('password').fill('1234')
-
-    await page.getByRole('button', { name: 'login' }).click()
-
-    await expect(page.getByText('John Test logged-in')).toBeVisible()
+  test('user can log in', async ({ page }) => {
+    await loginWith(page, 'johnt', '1234')
+    await expect(page.getByText('John Test logged-in')).toBeVisible
   })
 
   test('login fails with wrong passsword', async ({ page }) => {
-    await page.getByRole('button', { name: 'log in' }).click()
-    await page.getByTestId('username').fill('johnt')
-    await page.getByTestId('password').fill('12345')
-    await page.getByRole('button', { name: 'login' }).click()
+    await loginWith(page, 'johnt', '12345')
 
     const errorDiv = await page.locator('.error')
     await expect(errorDiv).toContainText('Wrong credentials')
@@ -53,29 +44,38 @@ describe('Note app', () => {
 
   describe('when logged in', () => {
     beforeEach(async ({ page }) => {
-      await page.getByRole('button', { name: 'log in' }).click()
-      await page.getByTestId('username').fill('johnt')
-      await page.getByTestId('password').fill('1234')
-      await page.getByRole('button', { name: 'login' }).click()
+      await loginWith(page, 'johnt', '1234')
     })
 
     test('a new note can be created', async ({ page }) => {
-      await page.getByRole('button', { name: 'new note' }).click()
-      await page.getByRole('textbox').fill('a note created by playwright')
-      await page.getByRole('button', { name: 'save' }).click()
+      await createNote(page, 'a note created by playwright')
       await expect(page.getByText('a note created by playwright')).toBeVisible()
     })
 
-    describe('and a note exists', () => {
+    // describe('and a note exists', () => {
+    //   beforeEach(async ({ page }) => {
+    //     await createNote(page, 'another note by playwright')
+    //   })
+
+    //   test('importance can be changed', async ({ page }) => {
+    //     await page.getByRole('button', { name: 'make not important' }).click()
+    //     await expect(page.getByText('make important')).toBeVisible()
+    //   })
+    // })
+
+    describe('and several notes exists', () => {
       beforeEach(async ({ page }) => {
-        await page.getByRole('button', { name: 'new note' }).click()
-        await page.getByRole('textbox').fill('another note by playwright')
-        await page.getByRole('button', { name: 'save' }).click()
+        await createNote(page, 'first note', true)
+        await createNote(page, 'second note', true)
       })
 
-      test('importance can be changed', async ({ page }) => {
-        await page.getByRole('button', { name: 'make not important' }).click()
-        await expect(page.getByText('make important')).toBeVisible()
+      test('one of those can be made nonimportant', async ({ page }) => {
+        const otherNoteElement = await page.getByText('first note')
+
+        await otherNoteElement
+          .getByRole('button', { name: 'make not important' })
+          .click()
+        await expect(otherNoteElement.getByText('make important')).toBeVisible()
       })
     })
   })
