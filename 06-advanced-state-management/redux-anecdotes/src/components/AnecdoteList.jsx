@@ -18,22 +18,34 @@ const Anecdote = ({ anecdote, handleVote }) => {
 
 const AnecdoteList = () => {
   const dispatch = useDispatch()
-  const anecdotes = useSelector((state) => state)
+  const anecdotes = useSelector((state) => {
+    if (state.filter !== '') {
+      const all = state.anecdotes
+      console.log('FILTER ', state.filter)
+      console.log('ALL ', all)
+      return all.map((item) => item.content.includes(state.filter) && item)
+    } else {
+      return state.anecdotes
+    }
+  })
+  // console.log(anecdotes)
 
   const sortedAnecdotes = [...anecdotes].sort((a, b) => b.votes - a.votes)
 
   return (
     <div>
-      
-      {sortedAnecdotes.map((anecdote) => (
-        <Anecdote
-          key={anecdote.id}
-          anecdote={anecdote}
-          handleVote={() => {
-            dispatch(vote(anecdote.id))
-          }}
-        />
-      ))}
+      {sortedAnecdotes.map(
+        (anecdote) =>
+          anecdote && (
+            <Anecdote
+              key={anecdote.id}
+              anecdote={anecdote}
+              handleVote={() => {
+                dispatch(vote(anecdote.id))
+              }}
+            />
+          )
+      )}
     </div>
   )
 }
