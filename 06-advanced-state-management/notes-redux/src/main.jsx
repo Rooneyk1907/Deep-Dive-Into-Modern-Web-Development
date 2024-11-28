@@ -11,12 +11,21 @@ import filterReducer from './reducers/filterReducer.js'
 import { createNote } from './reducers/noteReducer'
 import { filterChange } from './reducers/filterReducer'
 
+import noteService from './services/notes'
+import noteReducer, { setNotes } from './reducers/noteReducer'
+
 const store = configureStore({
   reducer: {
     notes: noteReducer,
     filter: filterReducer,
   },
 })
+
+noteService.getAll().then((notes) =>
+  notes.forEach((note) => {
+    store.dispatch(setNotes(note))
+  })
+)
 
 console.log(store.getState())
 
