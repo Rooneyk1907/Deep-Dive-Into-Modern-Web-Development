@@ -1,23 +1,45 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createAnecdote } from '../requests'
+import { useNotificationDispatch } from '../NotificationContext'
+import { useCreateMutation, useAnecdoteDispatch } from '../AnecdoteContext'
 
 const AnecdoteForm = () => {
-  const queryClient = useQueryClient()
-
-  const newAnecdoteMutation = useMutation({
-    mutationFn: createAnecdote,
-    onSuccess: newAnecdote => {
-      queryClient.invalidateQueries('anecdotes')
-      const anecdotes = queryClient.getQueryData('anecdotes')
-      queryClient.setQueryData('anecdotes', anecdotes.concat(newAnecdote))
-    },
-  })
+  const notificationDispatch = useNotificationDispatch()
+  const anecdoteDispatch = useAnecdoteDispatch()
+  const createMutation = useCreateMutation()
 
   const onCreate = event => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
-    newAnecdoteMutation.mutate({ content, votes: 0 })
+
+    createMutation.mutate(
+      { content, votes: 0 },
+      {
+        onSuccess: newAnecdote => {
+          anecdoteDispatch({ type: 'ADD_ANECDOTE', payload: newAnecdote })
+          notificationDispatch({
+            type: 'NEW_ANECDOTE',
+            payload: `added ${newAnecdote.content}`,
+          })
+          setTimeout(
+            () => notificationDispatch({ type: 'CLEAR_NOTIFICATION' }),
+            5000
+          )
+        },
+        onError: () => {
+          notificationDispatch({
+            type: 'ERROR',
+            payload: 'too short anecdote, must have length 5 or more',
+          })
+          setTimeout(
+            () =>
+              notificationDispatch({
+                type: 'CLEAR_NOTIFICATION',
+              }),
+            5000
+          )
+        },
+      }
+    )
   }
 
   return (
