@@ -2,6 +2,10 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
 import { useState } from 'react'
+import { Table, Form, Button, Alert, Navbar, Nav } from 'react-bootstrap'
+import { Container } from '@mui/material'
+
+import Notes from './components/Notes'
 
 import {
   useMatch,
@@ -44,19 +48,6 @@ const Note = ({ notes }) => {
   )
 }
 
-const Notes = ({ notes }) => (
-  <div>
-    <h2>Notes</h2>
-    <ul>
-      {notes.map(note => (
-        <li key={note.id}>
-          <Link to={`/notes/${note.id}`}>{note.content}</Link>
-        </li>
-      ))}
-    </ul>
-  </div>
-)
-
 const Users = () => (
   <div>
     <h2>TKTL notes app</h2>
@@ -80,15 +71,24 @@ const Login = props => {
   return (
     <div>
       <h2>login</h2>
-      <form onSubmit={onSubmit}>
-        <div>
-          username: <input />
-        </div>
-        <div>
-          password: <input type='password' />
-        </div>
-        <button type='submit'>login</button>
-      </form>
+      <Form onSubmit={onSubmit}>
+        <Form.Group>
+          <Form.Label>username:</Form.Label>
+          <Form.Control
+            type='text'
+            name='username'
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>password:</Form.Label>
+          <Form.Control type='password' />
+        </Form.Group>
+        <Button
+          variant='primary'
+          type='submit'>
+          login
+        </Button>
+      </Form>
     </div>
   )
 }
@@ -116,9 +116,14 @@ const App = () => {
   ])
 
   const [user, setUser] = useState(null)
+  const [message, setMessage] = useState(null)
 
   const login = user => {
     setUser(user)
+    setMessage(`welcom ${user}`)
+    setTimeout(() => {
+      setMessage(null)
+    }, 10000)
   }
 
   const padding = {
@@ -126,71 +131,96 @@ const App = () => {
   }
 
   return (
-    <div>
-      <div>
-        <Link
-          style={padding}
-          to='/'>
-          home
-        </Link>
-        <Link
-          style={padding}
-          to='/notes'>
-          notes
-        </Link>
-        <Link
-          style={padding}
-          to='/users'>
-          users
-        </Link>
-        {user ? (
-          <em>{user} logged in</em>
-        ) : (
-          <Link
-            style={padding}
-            to='/login'>
-            login
-          </Link>
-        )}
+    <Container>
+      <div className='container'>
+        {message && <Alert variant='success'>{message}</Alert>}
+
+        <Navbar
+          collapseOnSelect
+          expand='lg'
+          bg='dark'
+          variant='dark'>
+          <Navbar.Toggle aria-controls='responsive-navbar-nav' />
+          <Navbar.Collapse id='responsive-navbar-nav'>
+            <Nav className='mr-auto'>
+              <Nav.Link
+                href='#'
+                as='span'>
+                <Link
+                  style={padding}
+                  to='/'>
+                  home
+                </Link>
+              </Nav.Link>
+              <Nav.Link
+                href='#'
+                as='span'>
+                <Link
+                  style={padding}
+                  to='/notes'>
+                  notes
+                </Link>
+              </Nav.Link>
+              <Link
+                style={padding}
+                to='/users'>
+                users
+              </Link>
+              <Nav.Link
+                href='#'
+                as='span'>
+                <Nav.Link
+                  href='#'
+                  as='span'>
+                  {user ? (
+                    <em>{user} logged in</em>
+                  ) : (
+                    <Link to='/login'>login</Link>
+                  )}
+                </Nav.Link>
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Navbar>
+
+        <Routes>
+          <Route
+            path='/notes/:id'
+            element={<Note notes={notes} />}
+          />
+          <Route
+            path='/notes'
+            element={<Notes notes={notes} />}
+          />
+          <Route
+            path='/users'
+            element={
+              user ? (
+                <Users />
+              ) : (
+                <Navigate
+                  replace
+                  to='/login'
+                />
+              )
+            }
+          />
+          <Route
+            path='/login'
+            element={<Login onLogin={login} />}
+          />
+          <Route
+            path='/'
+            element={<Home />}
+          />
+        </Routes>
+
+        <footer>
+          <br />
+          <em>Note app, Department of Computer Science 2023</em>
+        </footer>
       </div>
-
-      <Routes>
-        <Route
-          path='/notes/:id'
-          element={<Note notes={notes} />}
-        />
-        <Route
-          path='/notes'
-          element={<Notes notes={notes} />}
-        />
-        <Route
-          path='/users'
-          element={
-            user ? (
-              <Users />
-            ) : (
-              <Navigate
-                replace
-                to='/login'
-              />
-            )
-          }
-        />
-        <Route
-          path='/login'
-          element={<Login onLogin={login} />}
-        />
-        <Route
-          path='/'
-          element={<Home />}
-        />
-      </Routes>
-
-      <footer>
-        <br />
-        <em>Note app, Department of Computer Science 2023</em>
-      </footer>
-    </div>
+    </Container>
   )
 }
 
