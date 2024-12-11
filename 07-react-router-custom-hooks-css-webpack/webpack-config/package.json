@@ -1,0 +1,29 @@
+{
+  "name": "webpack-osa7",
+  "version": "0.0.1",
+  "description": "practising webpack",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "start": "webpack serve --mode=development"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.2",
+    "source-map": "^0.7.4",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.2.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "core-js": "^3.39.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "regenerator-runtime": "^0.14.1"
+  }
+}
