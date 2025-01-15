@@ -21,8 +21,8 @@ const store = configureStore({
   },
 })
 
-noteService.getAll().then((notes) =>
-  notes.forEach((note) => {
+noteService.getAll().then(notes =>
+  notes.forEach(note => {
     store.dispatch(setNotes(note))
   })
 )
